@@ -19,6 +19,7 @@ function AchievementOverview(props: AchievementOverviewProps) {
       <AchievementLevel studentExp={studentExp} />
       <h3>{name}</h3>
       <h3>{studio}</h3>
+      <h3 style={{ border: 'solid red', color: 'red', padding: '0.1em 0.2em' }}>BETA</h3>
     </div>
   );
 }
