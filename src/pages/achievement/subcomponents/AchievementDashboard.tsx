@@ -21,7 +21,7 @@ export type StateProps = {
 };
 
 function Dashboard(props: DispatchProps & StateProps) {
-  const { inferencer, name, group, handleAchievementsFetch } = props;
+  const { inferencer, handleAchievementsFetch } = props;
 
   useEffect(() => {
     if (Constants.useBackend) {
@@ -58,11 +58,7 @@ function Dashboard(props: DispatchProps & StateProps) {
 
   return (
     <div className="AchievementDashboard">
-      <AchievementOverview
-        name={name || 'User'}
-        studio={group || 'Staff'}
-        inferencer={inferencer}
-      />
+      <AchievementOverview name={'Jet Kan'} studio={'T12-A'} inferencer={inferencer} />
 
       <div className="achievement-main">
         <div className="filter-container">

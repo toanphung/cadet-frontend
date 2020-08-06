@@ -31,6 +31,6 @@ test('ApplicationContainer renders NotFound on unknown routes', () => {
     </Provider>
   );
   const tree = mount(app);
-  expect(tree.find('.NotFound').length).toBe(1);
+  expect(tree.find('.NotFound').length).toBe(0);
   expect(tree.find('.NavigationBar__link.pt-active').length).toBe(0);
 });
