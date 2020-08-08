@@ -61,7 +61,7 @@ const NavigationBar: React.SFC<NavigationBarProps> = props => (
           {Constants.playgroundOnly ? 'Source Academy Playground' : 'Playground'}
         </div>
       </NavLink>
-      {props.role && (
+      {props.role && props.role !== 'student' && (
         <NavLink
           activeClassName={Classes.ACTIVE}
           className={classNames('NavigationBar__link', Classes.BUTTON, Classes.MINIMAL)}

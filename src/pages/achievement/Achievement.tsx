@@ -18,13 +18,17 @@ const redirectTo404 = () => <Redirect to="/404" />;
 function Achievement(props: AchievementProps) {
   const { role } = props;
 
-  const toAchievementControl =
-    role === Role.Admin || role === Role.Staff ? AchievementControl : redirectTo404;
+  const allowStaffOnly = (component: any) =>
+    role === Role.Admin || role === Role.Staff ? component : redirectTo404;
 
   return (
     <Switch>
-      <Route exact={true} path="/achievement" component={AchievementDashboard}></Route>
-      <Route path="/achievement/control" component={toAchievementControl}></Route>
+      <Route
+        exact={true}
+        path="/achievement"
+        component={allowStaffOnly(AchievementDashboard)}
+      ></Route>
+      <Route path="/achievement/control" component={allowStaffOnly(AchievementControl)}></Route>
       <Route component={redirectTo404} />
     </Switch>
   );
