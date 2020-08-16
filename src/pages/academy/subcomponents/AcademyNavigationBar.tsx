@@ -9,13 +9,12 @@ import { AssessmentCategories } from '../../../commons/assessment/AssessmentType
 import NotificationBadgeContainer from '../../../commons/notificationBadge/NotificationBadgeContainer';
 import { filterNotificationsByType } from '../../../commons/notificationBadge/NotificationBadgeHelper';
 import { assessmentCategoryLink } from '../../../commons/utils/ParamParseHelper';
-import DefaultChapterContainer from './AcademyDefaultChapterContainer';
 
 type OwnProps = {
   role: Role;
 };
 
-const AcademyNavigationBar: React.SFC<OwnProps> = props => (
+const AcademyNavigationBar: React.FunctionComponent<OwnProps> = props => (
   <Navbar className="NavigationBar secondary-navbar">
     <NavbarGroup align={Alignment.LEFT}>
       <NavLink
@@ -76,20 +75,18 @@ const AcademyNavigationBar: React.SFC<OwnProps> = props => (
         className={classNames('NavigationBar__link', Classes.BUTTON, Classes.MINIMAL)}
       >
         <Icon icon={IconNames.MANUAL} />
-        <div className="navbar-button-text hidden-xs hidden-sm">Practical</div>
+        <div className="navbar-button-text hidden-xs hidden-sm">Others</div>
       </NavLink>
     </NavbarGroup>
     {props.role === Role.Admin || props.role === Role.Staff ? (
       <NavbarGroup align={Alignment.RIGHT}>
-        <DefaultChapterContainer />
-
         <NavLink
           to={'/academy/groundcontrol'}
           activeClassName={Classes.ACTIVE}
           className={classNames('NavigationBar__link', Classes.BUTTON, Classes.MINIMAL)}
         >
           <Icon icon="satellite" />
-          <div className="navbar-button-text hidden-xs hidden-sm hidden-md">Ground Control</div>
+          <div className="navbar-button-text hidden-xs hidden-sm">Ground Control</div>
         </NavLink>
 
         <NavLink
@@ -98,7 +95,7 @@ const AcademyNavigationBar: React.SFC<OwnProps> = props => (
           className={classNames('NavigationBar__link', Classes.BUTTON, Classes.MINIMAL)}
         >
           <Icon icon="globe" />
-          <div className="navbar-button-text hidden-xs hidden-sm hidden-md">Dashboard</div>
+          <div className="navbar-button-text hidden-xs hidden-sm">Dashboard</div>
         </NavLink>
 
         <NavLink
@@ -107,7 +104,7 @@ const AcademyNavigationBar: React.SFC<OwnProps> = props => (
           className={classNames('NavigationBar__link', Classes.BUTTON, Classes.MINIMAL)}
         >
           <Icon icon={IconNames.MOBILE_VIDEO} />
-          <div className="navbar-button-text hidden-xs hidden-sm hidden-md">Sourcereel</div>
+          <div className="navbar-button-text hidden-xs hidden-sm">Sourcereel</div>
         </NavLink>
 
         <NavLink
@@ -116,7 +113,7 @@ const AcademyNavigationBar: React.SFC<OwnProps> = props => (
           className={classNames('NavigationBar__link', Classes.BUTTON, Classes.MINIMAL)}
         >
           <Icon icon={IconNames.ENDORSED} />
-          <div className="navbar-button-text hidden-xs hidden-sm hidden-md">Grading</div>
+          <div className="navbar-button-text hidden-xs hidden-sm">Grading</div>
           <NotificationBadgeContainer
             notificationFilter={filterNotificationsByType('Grading')}
             disableHover={true}
@@ -129,7 +126,7 @@ const AcademyNavigationBar: React.SFC<OwnProps> = props => (
           className={classNames('NavigationBar__link', Classes.BUTTON, Classes.MINIMAL)}
         >
           <Icon icon={IconNames.CROWN} />
-          <div className="navbar-button-text hidden-xs hidden-sm hidden-md">Story Simulator</div>
+          <div className="navbar-button-text hidden-xs hidden-sm">Story Simulator</div>
         </NavLink>
       </NavbarGroup>
     ) : null}

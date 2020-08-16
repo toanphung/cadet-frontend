@@ -1,39 +1,32 @@
 import { Icon, Intent, ProgressBar } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import React from 'react';
+import React, { useContext } from 'react';
+import { AchievementContext, handleGlow } from 'src/features/achievement/AchievementConstants';
 
 import { AchievementStatus } from '../../features/achievement/AchievementTypes';
-import AchievementDeadline from './utils/AchievementDeadline';
-import AchievementExp from './utils/AchievementExp';
-import AchievementInferencer from './utils/AchievementInferencer';
+import AchievementDeadline from './card/AchievementDeadline';
+import AchievementXp from './card/AchievementXp';
 
 type AchievementCardProps = {
   id: number;
-  inferencer: AchievementInferencer;
-  shouldPartiallyRender: boolean;
-  displayView: any;
-  handleGlow: any;
+  focusState: [number, any];
   isDropdownOpen?: boolean;
-  toggleDropdown?: any;
+  shouldRender: boolean;
+  toggleDropdown?: () => void;
 };
 
 function AchievementCard(props: AchievementCardProps) {
-  const {
-    id,
-    inferencer,
-    shouldPartiallyRender,
-    displayView,
-    handleGlow,
-    isDropdownOpen,
-    toggleDropdown
-  } = props;
+  const { id, focusState, isDropdownOpen, shouldRender, toggleDropdown } = props;
 
-  const { title, ability, cardTileUrl } = inferencer.getAchievementItem(id);
+  const inferencer = useContext(AchievementContext);
 
-  const status = inferencer.getStatus(id);
+  const [focusId, setFocusId] = focusState;
+
+  const { ability, cardBackground, title } = inferencer.getAchievement(id);
   const displayDeadline = inferencer.getDisplayDeadline(id);
-  const displayExp = inferencer.getMaxExp(id);
+  const displayXp = inferencer.getAchievementMaxXp(id);
   const progressFrac = inferencer.getProgressFrac(id);
+  const status = inferencer.getStatus(id);
 
   // Only task card with prerequisites has dropdown button
   const hasDropdown =
@@ -43,27 +36,25 @@ function AchievementCard(props: AchievementCardProps) {
     <div
       className="achievement-card"
       style={{
-        ...handleGlow(id),
-        opacity: shouldPartiallyRender ? '20%' : '100%',
-        background: `url(${cardTileUrl}) center/cover`
+        ...handleGlow(id, focusId, ability),
+        opacity: shouldRender ? '100%' : '20%',
+        background: `url(${cardBackground}) center/cover`
       }}
-      onClick={() => displayView(id)}
+      onClick={() => setFocusId(id)}
       onClickCapture={toggleDropdown}
     >
       <div className="dropdown-button">
-        {hasDropdown ? (
+        {hasDropdown && (
           <Icon icon={isDropdownOpen ? IconNames.CARET_DOWN : IconNames.CARET_RIGHT} />
-        ) : null}
+        )}
       </div>
 
       <div className="content">
         <div className="heading">
           <h3>{title.toUpperCase()}</h3>
-          <span className="status">
-            {status === AchievementStatus.COMPLETED && (
-              <Icon icon={IconNames.CONFIRM} intent={Intent.SUCCESS} style={{ padding: '1em' }} />
-            )}
-          </span>
+          {status === AchievementStatus.COMPLETED && (
+            <Icon icon={IconNames.CONFIRM} intent={Intent.SUCCESS} style={{ padding: '1em' }} />
+          )}
         </div>
 
         <div className="details">
@@ -71,7 +62,7 @@ function AchievementCard(props: AchievementCardProps) {
             <p>{ability}</p>
           </div>
           <AchievementDeadline deadline={displayDeadline} ability={ability} />
-          <AchievementExp exp={displayExp} isBonus={hasDropdown} />
+          <AchievementXp xp={displayXp} isBonus={hasDropdown} />
         </div>
 
         <ProgressBar

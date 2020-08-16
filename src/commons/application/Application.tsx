@@ -12,7 +12,8 @@ export type DispatchProps = {
   handleClearContext: (
     chapter: number,
     variant: Variant,
-    externalLibraryName: ExternalLibraryName
+    externalLibraryName: ExternalLibraryName,
+    shouldInitLibrary: boolean
   ) => void;
   handleEditorValueChange: (val: string) => void;
   handleEditorUpdateBreakpoints: (breakpoints: string[]) => void;
@@ -34,6 +35,19 @@ export type StateProps = {
 
 class Application extends React.Component<ApplicationProps, {}> {
   public render() {
+    const fullPaths = Constants.playgroundOnly
+      ? null
+      : [
+          <Route path="/academy" component={toAcademy(this.props)} key={0} />,
+          <Route
+            path={'/mission-control/:assessmentId(-?\\d+)?/:questionId(\\d+)?'}
+            render={toIncubator}
+            key={1}
+          />,
+          <Route path="/achievement" component={toAchievement(this.props)} key={2} />,
+          <Route path="/login" render={toLogin(this.props)} key={3} />
+        ];
+
     return (
       <div className="Application">
         <NavigationBar

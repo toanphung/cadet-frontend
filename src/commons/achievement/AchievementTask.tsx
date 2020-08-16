@@ -1,31 +1,33 @@
-import React, { useState } from 'react';
+import { Collapse } from '@blueprintjs/core';
+import React, { useContext, useState } from 'react';
 
-import { getAbilityColor } from '../../features/achievement/AchievementConstants';
+import {
+  AchievementContext,
+  getAbilityColor
+} from '../../features/achievement/AchievementConstants';
 import { AchievementStatus, FilterStatus } from '../../features/achievement/AchievementTypes';
 import AchievementCard from './AchievementCard';
-import AchievementInferencer from './utils/AchievementInferencer';
 
 type AchievementTaskProps = {
   id: number;
-  inferencer: AchievementInferencer;
   filterStatus: FilterStatus;
-  displayView: any;
-  handleGlow: any;
+  focusState: [number, any];
 };
 
 function AchievementTask(props: AchievementTaskProps) {
-  const { id, inferencer, filterStatus, displayView, handleGlow } = props;
+  const { id, filterStatus, focusState } = props;
+
+  const inferencer = useContext(AchievementContext);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
+  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
-  const taskColor = getAbilityColor(inferencer.getAchievementItem(id).ability);
+  const prerequisiteIds = [...inferencer.getImmediateChildren(id)];
+  const taskColor = getAbilityColor(inferencer.getAchievement(id).ability);
 
   /**
    * Checks whether the AchievementItem (can be a task or prereq) should be rendered
-   * based on the achivement page filterStatus.
+   * based on the achievement dashboard filterStatus.
    */
   const shouldRender = (id: number): boolean => {
     const status = inferencer.getStatus(id);
@@ -42,14 +44,14 @@ function AchievementTask(props: AchievementTaskProps) {
   };
 
   /**
-   * Checks whether the achievement item has any prerequisite item that
-   * should be rendered based on the achievement page filterStatus.
+   * Checks whether the AchievementItem has any prerequisite that
+   * should be rendered based on the achievement dashboard filterStatus.
    *
    * If there is at least 1 prerequisite that needs to be rendered,
    * the whole AchievementTask will be rendered together.
    */
   const shouldRenderPrerequisites = (id: number) => {
-    const children = inferencer.listImmediateChildren(id);
+    const children = [...inferencer.getImmediateChildren(id)];
     return children.reduce((canRender, prerequisite) => {
       return canRender || shouldRender(prerequisite);
     }, false);
@@ -64,20 +66,18 @@ function AchievementTask(props: AchievementTaskProps) {
   return (
     <>
       {shouldRenderTask(id) && (
-        <li key={id}>
+        <li className="task">
           <AchievementCard
             id={id}
-            inferencer={inferencer}
-            shouldPartiallyRender={!shouldRender(id)}
-            displayView={displayView}
-            handleGlow={handleGlow}
+            focusState={focusState}
             isDropdownOpen={isDropdownOpen}
+            shouldRender={shouldRender(id)}
             toggleDropdown={toggleDropdown}
           />
-          {isDropdownOpen && (
+          <Collapse isOpen={isDropdownOpen} keepChildrenMounted={true}>
             <div className="prerequisite-container">
-              {inferencer.listImmediateChildren(id).map(prerequisite => (
-                <div className="prerequisite" key={prerequisite}>
+              {prerequisiteIds.map(prerequisiteId => (
+                <div className="prerequisite" key={prerequisiteId}>
                   <div
                     className="dropdown-lines"
                     style={{
@@ -86,16 +86,14 @@ function AchievementTask(props: AchievementTaskProps) {
                     }}
                   ></div>
                   <AchievementCard
-                    id={prerequisite}
-                    inferencer={inferencer}
-                    shouldPartiallyRender={!shouldRender(prerequisite)}
-                    displayView={displayView}
-                    handleGlow={handleGlow}
+                    id={prerequisiteId}
+                    focusState={focusState}
+                    shouldRender={shouldRender(prerequisiteId)}
                   />
                 </div>
               ))}
             </div>
-          )}
+          </Collapse>
         </li>
       )}
     </>

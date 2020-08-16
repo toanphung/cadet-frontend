@@ -2,6 +2,8 @@ import { SagaIterator } from 'redux-saga';
 import { call, put, select } from 'redux-saga/effects';
 
 import {
+  BULK_UPDATE_ACHIEVEMENTS,
+  BULK_UPDATE_GOALS,
   EDIT_ACHIEVEMENT,
   EDIT_GOAL,
   GET_ACHIEVEMENTS,
@@ -14,6 +16,8 @@ import {
 import { OverallState } from '../application/ApplicationTypes';
 import { actions } from '../utils/ActionsHelper';
 import {
+  bulkUpdateAchievements,
+  bulkUpdateGoals,
   editAchievement,
   editGoal,
   getAchievements,
@@ -26,16 +30,37 @@ import {
 import { safeTakeEvery as takeEvery } from './SafeEffects';
 
 export default function* AchievementSaga(): SagaIterator {
-  yield takeEvery(GET_ACHIEVEMENTS, function* () {
+  yield takeEvery(BULK_UPDATE_ACHIEVEMENTS, function* (
+    action: ReturnType<typeof actions.bulkUpdateAchievements>
+  ) {
     const tokens = yield select((state: OverallState) => ({
       accessToken: state.session.accessToken,
       refreshToken: state.session.refreshToken
     }));
 
-    const achievements = yield call(getAchievements, tokens);
+    const achievements = action.payload;
 
-    if (achievements) {
-      yield put(actions.saveAchievements(achievements));
+    const resp = yield call(bulkUpdateAchievements, achievements, tokens);
+
+    if (!resp) {
+      return;
+    }
+  });
+
+  yield takeEvery(BULK_UPDATE_GOALS, function* (
+    action: ReturnType<typeof actions.bulkUpdateGoals>
+  ) {
+    const tokens = yield select((state: OverallState) => ({
+      accessToken: state.session.accessToken,
+      refreshToken: state.session.refreshToken
+    }));
+
+    const goals = action.payload;
+
+    const resp = yield call(bulkUpdateGoals, goals, tokens);
+
+    if (!resp) {
+      return;
     }
   });
 
@@ -51,6 +76,62 @@ export default function* AchievementSaga(): SagaIterator {
 
     if (!resp) {
       return;
+    }
+  });
+
+  yield takeEvery(EDIT_GOAL, function* (action: ReturnType<typeof actions.editGoal>) {
+    const tokens = yield select((state: OverallState) => ({
+      accessToken: state.session.accessToken,
+      refreshToken: state.session.refreshToken
+    }));
+
+    const definition = action.payload;
+
+    const resp = yield call(editGoal, definition, tokens);
+
+    if (!resp) {
+      return;
+    }
+  });
+
+  yield takeEvery(GET_ACHIEVEMENTS, function* () {
+    const tokens = yield select((state: OverallState) => ({
+      accessToken: state.session.accessToken,
+      refreshToken: state.session.refreshToken
+    }));
+
+    const achievements = yield call(getAchievements, tokens);
+
+    if (achievements) {
+      yield put(actions.saveAchievements(achievements));
+    }
+  });
+
+  yield takeEvery(GET_GOALS, function* (action: ReturnType<typeof actions.getGoals>) {
+    const tokens = yield select((state: OverallState) => ({
+      accessToken: state.session.accessToken,
+      refreshToken: state.session.refreshToken
+    }));
+
+    const studentId = action.payload;
+
+    const goals = yield call(getGoals, tokens, studentId);
+
+    if (goals) {
+      yield put(actions.saveGoals(goals));
+    }
+  });
+
+  yield takeEvery(GET_OWN_GOALS, function* (action: ReturnType<typeof actions.getOwnGoals>) {
+    const tokens = yield select((state: OverallState) => ({
+      accessToken: state.session.accessToken,
+      refreshToken: state.session.refreshToken
+    }));
+
+    const goals = yield call(getOwnGoals, tokens);
+
+    if (goals) {
+      yield put(actions.saveGoals(goals));
     }
   });
 
@@ -80,49 +161,6 @@ export default function* AchievementSaga(): SagaIterator {
     const definition = action.payload;
 
     const resp = yield call(removeGoal, definition, tokens);
-
-    if (!resp) {
-      return;
-    }
-  });
-
-  yield takeEvery(GET_OWN_GOALS, function* (action: ReturnType<typeof actions.getOwnGoals>) {
-    const tokens = yield select((state: OverallState) => ({
-      accessToken: state.session.accessToken,
-      refreshToken: state.session.refreshToken
-    }));
-
-    const goals = yield call(getOwnGoals, tokens);
-
-    if (goals) {
-      yield put(actions.saveGoals(goals));
-    }
-  });
-
-  yield takeEvery(GET_GOALS, function* (action: ReturnType<typeof actions.getGoals>) {
-    const tokens = yield select((state: OverallState) => ({
-      accessToken: state.session.accessToken,
-      refreshToken: state.session.refreshToken
-    }));
-
-    const studentId = action.payload;
-
-    const goals = yield call(getGoals, tokens, studentId);
-
-    if (goals) {
-      yield put(actions.saveGoals(goals));
-    }
-  });
-
-  yield takeEvery(EDIT_GOAL, function* (action: ReturnType<typeof actions.editGoal>) {
-    const tokens = yield select((state: OverallState) => ({
-      accessToken: state.session.accessToken,
-      refreshToken: state.session.refreshToken
-    }));
-
-    const definition = action.payload;
-
-    const resp = yield call(editGoal, definition, tokens);
 
     if (!resp) {
       return;

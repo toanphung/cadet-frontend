@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import { Prompt } from 'react-router';
 
-import AchievementControlPanel from '../../../commons/achievement/control/AchievementControlPanel';
 import AchievementEditor from '../../../commons/achievement/control/AchievementEditor';
+import AchievementPreview from '../../../commons/achievement/control/AchievementPreview';
+import GoalEditor from '../../../commons/achievement/control/GoalEditor';
 import AchievementInferencer from '../../../commons/achievement/utils/AchievementInferencer';
-import { AchievementGoal, AchievementItem } from '../../../features/achievement/AchievementTypes';
+import Constants from '../../../commons/utils/Constants';
+import { AchievementContext } from '../../../features/achievement/AchievementConstants';
+import { AchievementItem, GoalDefinition } from '../../../features/achievement/AchievementTypes';
 
 export type DispatchProps = {
-  handleFetchAchievements: () => void;
-  handleSaveAchievements: (achievements: AchievementItem[]) => void;
-  handleEditAchievement: (achievement: AchievementItem) => void;
-  handleRemoveGoal: (goal: AchievementGoal, achievement: AchievementItem) => void;
-  handleRemoveAchievement: (achievement: AchievementItem) => void;
+  handleBulkUpdateAchievements: (achievements: AchievementItem[]) => void;
+  handleBulkUpdateGoals: (goals: GoalDefinition[]) => void;
+  handleGetAchievements: () => void;
+  handleGetOwnGoals: () => void;
 };
 
 export type StateProps = {
@@ -19,66 +22,72 @@ export type StateProps = {
 
 function AchievementControl(props: DispatchProps & StateProps) {
   const {
-    inferencer,
-    handleFetchAchievements,
-    handleSaveAchievements,
-    handleEditAchievement,
-    handleRemoveGoal,
-    handleRemoveAchievement
+    handleBulkUpdateAchievements,
+    handleBulkUpdateGoals,
+    handleGetAchievements,
+    handleGetOwnGoals,
+    inferencer
   } = props;
 
-  const [editorUnsavedChanges, setEditorUnsavedChanges] = useState<number>(0);
-  const [panelPendingUpload, setPanelPendingUpload] = useState<boolean>(false);
-
+  /**
+   * The latest achievements and goals from backend are fetched when the page is rendered
+   */
   useEffect(() => {
-    if (editorUnsavedChanges !== 0 || panelPendingUpload) {
-      window.onbeforeunload = () => true;
-    } else {
-      handleFetchAchievements();
-      window.onbeforeunload = null;
+    if (Constants.useBackend) {
+      handleGetAchievements();
+      handleGetOwnGoals();
     }
-  }, [handleFetchAchievements, editorUnsavedChanges, panelPendingUpload]);
+  }, [handleGetAchievements, handleGetOwnGoals]);
 
-  const addUnsavedChanges = (changes: number) =>
-    setEditorUnsavedChanges(editorUnsavedChanges + changes);
+  const achievements = inferencer.getAllAchievements();
+  const goals = inferencer.getAllGoals();
 
-  const addUnsavedChange = () => addUnsavedChanges(1);
-  const removeUnsavedChange = () => addUnsavedChanges(-1);
-
-  const updateAchievements = () => {
-    for (const achievement of inferencer.getAchievements()) {
-      handleEditAchievement(achievement);
-    }
+  /**
+   * Monitors changes that are awaiting publish
+   */
+  const publishState = useState<boolean>(false);
+  const [awaitPublish, setAwaitPublish] = publishState;
+  const handlePublish = () => {
+    // NOTE: Update goals first because goals must exist before their ID can be specified in achievements
+    handleBulkUpdateGoals(goals);
+    handleBulkUpdateAchievements(achievements);
+    setAwaitPublish(false);
+  };
+  const requestPublish = () => {
+    setAwaitPublish(true);
+    forceRender();
   };
 
+  /**
+   * Allows editor components to trigger a page re-render so that the AchievementPreview
+   * displays the latest local changes
+   *
+   * NOTE: AchievementContext should be able to observe the changes in the inferencer
+   * and automatically trigger a re-render in all child components. However, in
+   * <EditableAchievementCard /> modifying an achievement is done by calling
+   * inferencer.modifyAchievement() instead of using useState hooks recommended by React.
+   * Hence the AchievementContext is unaware of the changes and a forceRender() is needed.
+   *
+   * TODO: Refactor the <EditableAchievementCard /> workflow and deprecate forceRender()
+   */
   const [render, setRender] = useState<boolean>();
   const forceRender = () => setRender(!render);
 
   return (
-    <>
-      <div className="AchievementControl">
-        <AchievementControlPanel
-          inferencer={inferencer}
-          updateAchievements={updateAchievements}
-          forceRender={forceRender}
-          isDisabled={editorUnsavedChanges !== 0}
-          pendingUpload={panelPendingUpload}
-          setPendingUpload={setPanelPendingUpload}
-          saveAchievementsToFrontEnd={handleSaveAchievements}
-        />
+    <AchievementContext.Provider value={inferencer}>
+      <Prompt
+        when={awaitPublish}
+        message="You have unpublished changes. Are you sure you want to leave?"
+      />
 
-        <AchievementEditor
-          inferencer={inferencer}
-          updateAchievements={updateAchievements}
-          editAchievement={handleEditAchievement}
-          forceRender={forceRender}
-          addUnsavedChange={addUnsavedChange}
-          removeUnsavedChange={removeUnsavedChange}
-          removeAchievement={handleRemoveAchievement}
-          removeGoal={handleRemoveGoal}
-        />
+      <div className="AchievementControl">
+        <AchievementPreview awaitPublish={awaitPublish} handlePublish={handlePublish} />
+
+        <AchievementEditor requestPublish={requestPublish} />
+
+        <GoalEditor requestPublish={requestPublish} />
       </div>
-    </>
+    </AchievementContext.Provider>
   );
 }
 

@@ -1,384 +1,373 @@
 .AchievementControl {
+  // Cover aspect ratio 2:1
+  $cover-height: 18em;
+  $cover-width: 36em;
+  // Card aspect ratio 2:1
+  $card-height: 5em;
+  $card-width: 30em;
+  // View aspect ratio 18:25
+  $view-height: 50em;
+  $view-width: $cover-width;
+
+  $cover-spacing: 0.3em;
+  $content-spacing: 0.5em;
+  $default-spacing: 1em;
+
+  background: black url(#{$achievement-assets}/background.png) center/cover no-repeat fixed;
   display: flex;
   flex-direction: row;
-  flex: 1 1 100%;
-  background-size: cover;
-  background-image: linear-gradient(
-      to right,
-      rgba(0, 0, 0, 0.3),
-      rgba(0, 0, 0, 0.6),
-      rgba(0, 0, 0, 0.3)
-    ),
-    url(#{$achievement-assets}/background.png);
+  height: 100%;
+  overflow: auto;
+  width: 100%;
 
-  .bp3-dialog-container {
-    align-items: flex-start;
-    justify-content: flex-start;
+  // Interfaces e.g. Control Panel, Achievement Editor and Goal Editor
+  %platform {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin: 0 auto;
+    min-width: max-content;
+    overflow: hidden;
+    padding: $default-spacing $default-spacing / 2;
   }
 
-  .panel-disabler {
-    pointer-events: none;
-  }
+  // Command buttons on top of the interfaces, e.g. Add A Task, Publish Changes, etc.
+  .command {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 
-  .sample-cards {
-    width: 50%;
-    display: table;
-
-    .main-adder {
-      width: 100%;
-      text-align: center;
-    }
-
-    ::-webkit-scrollbar {
-      width: 12px;
-    }
-
-    ::-webkit-scrollbar-track {
-      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 1);
-      box-shadow: inset 0 0 6px rgba(0, 0, 0, 1);
-      -webkit-border-radius: 10px;
-      border-radius: 10px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      -webkit-border-radius: 10px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 1);
-    }
-
-    .display-list {
-      overflow: hidden;
-      overflow-y: scroll;
-      height: 800px;
-      max-height: 800px;
-      list-style: none;
-      padding-bottom: 10px;
-    }
-
-    .edit-container {
+    .command-button {
       display: flex;
-      flex-direction: row;
+      height: 1em;
+      margin: $default-spacing;
+    }
+  }
 
-      .main-cards {
-        flex-basis: 90%;
-        height: 100%;
+  // Unordered list container, has a vertical scrollbar
+  %container {
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    height: 90%;
+    list-style-type: none;
+    margin: 0;
+    overflow-y: auto;
+    padding: 0;
+    scrollbar-color: white #444;
+    scrollbar-width: thin;
 
-        .achievement-card {
+    li {
+      margin: $default-spacing;
+    }
+
+    li:not(:first-child) {
+      margin: 0 $default-spacing $default-spacing;
+    }
+  }
+
+  .achievement-preview {
+    @extend %platform;
+
+    .preview-container {
+      @extend %container;
+      width: $view-width + $default-spacing * 2;
+
+      .no-view {
+        align-items: center;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        margin: auto;
+      }
+
+      .view {
+        color: white;
+        display: flex;
+        flex-direction: column;
+        margin: $default-spacing;
+        min-height: $view-height;
+        width: $view-width;
+
+        .cover {
           display: flex;
+          flex-direction: column;
+          height: $cover-height;
+          text-align: center;
+          width: $cover-width;
 
-          flex-direction: row;
+          h1 {
+            margin: 0.5em auto 0;
+            padding: $cover-spacing;
+          }
 
-          // Card aspect ratio 6:1
-          height: 5em;
-          width: 30em;
-          padding: 0;
-          margin-bottom: 0.8em;
+          p {
+            margin: 0 auto;
+            padding: $cover-spacing;
+          }
 
-          justify-content: center;
+          .description {
+            color: yellow;
+            font-size: 0.85em;
+            margin: auto auto 1em;
+            width: 80%;
+          }
+        }
+
+        .goal {
           align-items: center;
+          display: flex;
+          flex-direction: row;
+          padding: $content-spacing;
+
+          .goal-badge {
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            min-width: 6em;
+            padding: 0 $content-spacing;
+
+            .goal-icon {
+              background: url(#{$achievement-assets}/xp-icon.png) center/contain;
+              height: 2em;
+              width: 2em;
+            }
+
+            p {
+              text-align: center;
+              font-size: 0.7em;
+              padding: 0.2em 0 0 0;
+            }
+          }
+
+          p {
+            margin: 0;
+            padding: 0;
+          }
+        }
+
+        hr {
+          background: lightgrey;
+          border: none;
+          height: 1px;
+          margin: $content-spacing auto;
+          width: 90%;
+        }
+
+        .completion {
+          padding: $content-spacing;
+          text-align: center;
+
+          h1 {
+            color: #fc0;
+            margin: 0 auto $content-spacing;
+          }
+
+          p {
+            margin: 0;
+            padding: 0;
+          }
+        }
+      }
+
+      .task {
+        .achievement-card {
           cursor: pointer;
+          display: flex;
+          flex-direction: row;
+          height: $card-height;
           transition: box-shadow 0.2s ease-out;
-          box-shadow: 0;
+          width: $card-width;
 
           .dropdown-button {
-            display: flex;
-
-            height: 5em;
-            width: 6em;
-            padding: 0 0 0 0.5em;
-
-            justify-content: flex-start;
             align-items: center;
+            display: flex;
+            height: $card-height;
+            padding: 0 0 0 0.5em;
+            width: $card-height;
           }
 
           .content {
             display: flex;
-
             flex-direction: column;
-
-            height: 5em;
-            width: 24em;
+            height: $card-height;
+            width: $card-width - $card-height;
 
             .heading {
+              align-items: center;
               display: flex;
               flex-direction: row;
-
-              height: 2.8em;
-
-              justify-content: flex-start;
-              align-items: center;
-
-              padding: 0.2em 0 0 0;
-
-              font-size: 0.7vw;
-
-              .week {
-                padding: 0 0 0 1em;
-                transform: scale(0.8);
-              }
+              height: $card-height * 3 / 5;
             }
 
             .details {
               display: flex;
               flex-direction: row;
+              font-size: 0.8em;
 
-              height: 1.9em;
-
-              font-size: 0.85em;
+              p {
+                margin: 0;
+              }
 
               .ability {
+                align-items: center;
                 display: flex;
-                flex: 0 1 55%;
+                flex: 1 1 50%;
               }
 
-              .deadline {
+              .deadline,
+              .xp {
+                align-items: center;
                 display: flex;
-                flex-direction: row;
-                flex: 0 1 25%;
-                align-items: stretch;
+                flex: 1 1 25%;
 
                 p {
-                  padding-left: 0.3em;
-                }
-              }
-
-              .exp {
-                display: flex;
-                flex-direction: row;
-                flex: 0 1 20%;
-                align-items: stretch;
-
-                p {
-                  padding-left: 0.3em;
+                  padding: 0 0 0 0.3em;
                 }
               }
             }
 
             .progress {
-              display: flex;
               height: 0.2em;
-              width: 23em;
-
-              align-items: flex-end;
+              margin: 0.2em 0 0 0;
+              width: 95%;
             }
           }
         }
 
         .achievement-card:hover {
-          transition: box-shadow 0.2s ease-in;
           box-shadow: 0 0 10px black;
+          transition: box-shadow 0.2s ease-in;
         }
 
-        .dropdown-container {
-          display: flex;
-          flex-direction: row;
-
-          .lines {
-            display: flex;
-            width: 10%;
-            flex-direction: column;
-
-            margin: -0.8em -0.8em 0 0.8em;
-
-            .l-shape {
-              height: 50%;
-              width: 60%;
-              border-bottom: 1px solid white;
-              border-left: 1px solid white;
-            }
-
-            .extend-bottom {
-              height: 50%;
-              border-left: 1px solid white;
-            }
-          }
-
-          .dropdown-button {
-            display: flex;
-
-            height: 5em;
-            width: 4em;
-
-            justify-content: flex-start;
-            align-items: center;
-          }
-        }
-      }
-
-      .editor-buttons {
-        flex-basis: 25%;
-        height: 10em;
-        margin-bottom: 0.5em;
-
-        display: flex;
-        flex-direction: column;
-
-        .task-selector {
-          margin-top: 10px;
-          text-align: center;
-          align-items: center;
-          justify-content: center;
+        .prerequisite-container {
+          $shrink-factor: 0.9;
+          $line-width: 1em;
+          // remaining-width is the empty space between line and card
+          $remaining-width: ((1 - $shrink-factor) * $card-width - 2 * $line-width) / 2;
+          $top-spacing: 0.2em;
 
           display: flex;
           flex-direction: column;
 
-          .editor-button {
-            width: 100%;
-          }
-
-          .move-editor-buttons {
+          .prerequisite {
             display: flex;
             flex-direction: row;
+            max-width: $card-width;
+
+            .dropdown-lines {
+              height: $top-spacing + $card-height;
+              margin: -#{$card-height / 2} -#{$line-width + $remaining-width} 0 $line-width;
+              min-width: $line-width;
+            }
+
+            .achievement-card {
+              margin: $top-spacing 0 0 0;
+              transform: scale($shrink-factor);
+            }
+          }
+
+          .prerequisite:first-child {
+            .dropdown-lines {
+              height: $top-spacing + $card-height / 2;
+              margin-top: 0;
+            }
           }
         }
       }
     }
   }
 
-  .editor-cards {
-    width: 50%;
-    display: table;
+  .achievement-editor {
+    @extend %platform;
 
-    .main-adder {
-      width: 100%;
-      text-align: center;
-    }
+    .achievement-container {
+      @extend %container;
+      width: $card-width + $default-spacing * 2;
 
-    ::-webkit-scrollbar {
-      width: 12px;
-    }
-
-    ::-webkit-scrollbar-track {
-      -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 1);
-      box-shadow: inset 0 0 6px rgba(0, 0, 0, 1);
-      -webkit-border-radius: 10px;
-      border-radius: 10px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      -webkit-border-radius: 10px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 1);
-    }
-
-    .display-list {
-      overflow: hidden;
-      overflow-y: scroll;
-      height: 800px;
-      max-height: 800px;
-      list-style: none;
-    }
-
-    .editable-achievement {
-      width: 90%;
-      background-color: #d9d9d9;
-
-      height: 20%;
-      margin-bottom: 10px;
-
-      display: flex;
-      flex-direction: column;
-
-      .top-bar {
+      .editable-card {
         display: flex;
         flex-direction: row;
-        justify-content: space-between;
-      }
+        height: $card-height;
+        width: $card-width;
 
-      .bp3-dialog-container {
-        align-items: center;
-        justify-content: center;
-
-        .goal {
+        .action-button {
+          align-items: center;
           display: flex;
           flex-direction: row;
-          justify-content: space-evenly;
-
-          .goal-medal {
-            display: flex;
-            flex-direction: column;
-            flex-basis: 25%;
-
-            text-align: center;
-            align-items: center;
-            justify-content: center;
-          }
-
-          .goal-text {
-            display: flex;
-            text-align: center;
-            align-items: center;
-            justify-content: center;
-          }
+          height: $card-height;
+          justify-content: center;
+          width: $card-height;
         }
 
-        .view-editor {
-          width: 100%;
+        .content {
           display: flex;
-          justify-content: center;
-          text-align: center;
-
-          .background-card {
-            max-width: 100%;
-            background-color: #333e50;
-          }
-
-          .view-img {
-            max-width: 100%;
-          }
-        }
-      }
-
-      .main {
-        display: flex;
-        flex-direction: row;
-        flex-basis: 80%;
-
-        .dropdown {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-basis: 10%;
-        }
-
-        .icon {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-basis: 10%;
-        }
-
-        .display {
-          display: flex;
-          justify-content: center;
-          margin-left: 10%;
-          width: 100%;
           flex-direction: column;
+          height: $card-height;
+          justify-content: space-evenly;
+          width: $card-width * 0.64;
+
+          .title {
+            align-items: center;
+            display: flex;
+            margin: 0;
+          }
 
           .details {
             display: flex;
-            flex-direction: row;
-            justify-content: space-evenly;
-
-            .ability {
-              flex-basis: 40%;
-            }
-
-            .deadline {
-              display: flex;
-              flex-direction: row;
-              flex-basis: 30%;
-            }
-
-            .exp {
-              display: flex;
-              margin-left: 5%;
-              flex-direction: row;
-              flex-basis: 30%;
-            }
           }
+        }
+
+        .content-button {
+          align-items: center;
+          display: flex;
+          margin: $default-spacing;
+          margin-left: auto;
         }
       }
     }
+  }
+
+  .goal-editor {
+    @extend %platform;
+
+    .goal-container {
+      @extend %container;
+      width: $card-width + $default-spacing * 2;
+
+      .editable-goal {
+        background: white;
+        display: flex;
+        flex-direction: column;
+        padding: $content-spacing;
+        width: $card-width;
+
+        .action-button {
+          align-items: center;
+          display: flex;
+          justify-content: center;
+        }
+
+        h3 {
+          margin: 0.5em 0 0 0;
+        }
+      }
+    }
+  }
+
+  // Scroll Bar
+  ::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  ::-webkit-scrollbar-track {
+    border-radius: 1.5px;
+    box-shadow: inset 0 0 3px black;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: white;
+    border-radius: 1.5px;
   }
 }

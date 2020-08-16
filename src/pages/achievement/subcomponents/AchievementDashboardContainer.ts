@@ -5,12 +5,12 @@ import AchievementInferencer from '../../../commons/achievement/utils/Achievemen
 import { OverallState } from '../../../commons/application/ApplicationTypes';
 import { mockAchievements, mockGoals } from '../../../commons/mocks/AchievementMocks';
 import Constants from '../../../commons/utils/Constants';
-import { getAchievements } from '../../../features/achievement/AchievementActions';
+import { getAchievements, getOwnGoals } from '../../../features/achievement/AchievementActions';
 import Dashboard, { DispatchProps, StateProps } from './AchievementDashboard';
 
 const mapStateToProps: MapStateToProps<StateProps, {}, OverallState> = state => ({
   inferencer: Constants.useBackend
-    ? new AchievementInferencer(mockAchievements, mockGoals) // TODO: state.achievement.goals
+    ? new AchievementInferencer(state.achievement.achievements, state.achievement.goals)
     : new AchievementInferencer(mockAchievements, mockGoals),
   name: state.session.name,
   group: state.session.group
@@ -19,7 +19,9 @@ const mapStateToProps: MapStateToProps<StateProps, {}, OverallState> = state => 
 const mapDispatchToProps: MapDispatchToProps<DispatchProps, {}> = (dispatch: Dispatch) =>
   bindActionCreators(
     {
-      handleAchievementsFetch: getAchievements
+      handleGetAchievements: getAchievements,
+      handleGetOwnGoals: getOwnGoals
+      // TODO: handleGetGoals: getGoals
     },
     dispatch
   );

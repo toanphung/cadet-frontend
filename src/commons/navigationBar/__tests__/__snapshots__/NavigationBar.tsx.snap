@@ -5,19 +5,19 @@ exports[`NavigationBar renders "Not logged in" correctly 1`] = `
   <Blueprint3.NavbarGroup align=\\"left\\">
     <NavLink className=\\"NavigationBar__link bp3-button bp3-minimal\\" to=\\"/achievement\\">
       <Blueprint3.Icon icon=\\"symbol-diamond\\" />
-      <Blueprint3.NavbarHeading className=\\"hidden-xs hidden-sm\\">
+      <Blueprint3.NavbarHeading className=\\"hidden-xs\\">
         Source Academy
       </Blueprint3.NavbarHeading>
     </NavLink>
     <NavLink className=\\"NavigationBar__link bp3-button bp3-minimal\\" to=\\"/achievement\\">
       <Blueprint3.Icon icon=\\"music\\" />
-      <div className=\\"navbar-button-text hidden-xs hidden-sm\\">
+      <div className=\\"navbar-button-text hidden-xs\\">
         Sourcecast
       </div>
     </NavLink>
     <NavLink className=\\"NavigationBar__link bp3-button bp3-minimal\\" to=\\"/achievement\\">
       <Blueprint3.Icon icon=\\"code\\" />
-      <div className=\\"navbar-button-text hidden-xs hidden-sm\\">
+      <div className=\\"navbar-button-text hidden-xs\\">
         Playground
       </div>
     </NavLink>
@@ -36,19 +36,19 @@ exports[`NavigationBar renders correctly with username 1`] = `
   <Blueprint3.NavbarGroup align=\\"left\\">
     <NavLink className=\\"NavigationBar__link bp3-button bp3-minimal\\" to=\\"/achievement\\">
       <Blueprint3.Icon icon=\\"symbol-diamond\\" />
-      <Blueprint3.NavbarHeading className=\\"hidden-xs hidden-sm\\">
+      <Blueprint3.NavbarHeading className=\\"hidden-xs\\">
         Source Academy
       </Blueprint3.NavbarHeading>
     </NavLink>
     <NavLink className=\\"NavigationBar__link bp3-button bp3-minimal\\" to=\\"/achievement\\">
       <Blueprint3.Icon icon=\\"music\\" />
-      <div className=\\"navbar-button-text hidden-xs hidden-sm\\">
+      <div className=\\"navbar-button-text hidden-xs\\">
         Sourcecast
       </div>
     </NavLink>
     <NavLink className=\\"NavigationBar__link bp3-button bp3-minimal\\" to=\\"/achievement\\">
       <Blueprint3.Icon icon=\\"code\\" />
-      <div className=\\"navbar-button-text hidden-xs hidden-sm\\">
+      <div className=\\"navbar-button-text hidden-xs\\">
         Playground
       </div>
     </NavLink>

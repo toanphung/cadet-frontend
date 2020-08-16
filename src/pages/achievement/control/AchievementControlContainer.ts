@@ -1,30 +1,31 @@
 import { connect, MapDispatchToProps, MapStateToProps } from 'react-redux';
 import { bindActionCreators, Dispatch } from 'redux';
+import Constants from 'src/commons/utils/Constants';
 
 import AchievementInferencer from '../../../commons/achievement/utils/AchievementInferencer';
 import { OverallState } from '../../../commons/application/ApplicationTypes';
 import { mockAchievements, mockGoals } from '../../../commons/mocks/AchievementMocks';
 import {
-  editAchievement,
+  bulkUpdateAchievements,
+  bulkUpdateGoals,
   getAchievements,
-  removeAchievement,
-  removeGoal,
-  saveAchievements
+  getOwnGoals
 } from '../../../features/achievement/AchievementActions';
 import AchievementControl, { DispatchProps, StateProps } from './AchievementControl';
 
 const mapStateToProps: MapStateToProps<StateProps, {}, OverallState> = state => ({
-  inferencer: new AchievementInferencer(mockAchievements, mockGoals) // TODO: use redux store
+  inferencer: Constants.useBackend
+    ? new AchievementInferencer(state.achievement.achievements, state.achievement.goals)
+    : new AchievementInferencer(mockAchievements, mockGoals)
 });
 
 const mapDispatchToProps: MapDispatchToProps<DispatchProps, {}> = (dispatch: Dispatch) =>
   bindActionCreators(
     {
-      handleFetchAchievements: getAchievements,
-      handleSaveAchievements: saveAchievements,
-      handleEditAchievement: editAchievement,
-      handleRemoveGoal: removeGoal,
-      handleRemoveAchievement: removeAchievement
+      handleBulkUpdateAchievements: bulkUpdateAchievements,
+      handleBulkUpdateGoals: bulkUpdateGoals,
+      handleGetAchievements: getAchievements,
+      handleGetOwnGoals: getOwnGoals
     },
     dispatch
   );

@@ -1,70 +1,51 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { AchievementContext } from 'src/features/achievement/AchievementConstants';
 
-import AchievementInferencer from '../utils/AchievementInferencer';
-import EditableAchievementCard from './editorTools/EditableAchievementCard';
-import AchievementAdder from './editorTools/editableUtils/AchievementAdder';
+import AchievementAdder from './achievementEditor/AchievementAdder';
+import EditableCard from './achievementEditor/EditableCard';
 
 type AchievementEditorProps = {
-  inferencer: AchievementInferencer;
-  updateAchievements: any;
-  editAchievement: any;
-  forceRender: any;
-  addUnsavedChange: any;
-  removeUnsavedChange: any;
-  removeGoal: any;
-  removeAchievement: any;
+  requestPublish: () => void;
 };
 
 function AchievementEditor(props: AchievementEditorProps) {
-  const {
-    inferencer,
-    updateAchievements,
-    editAchievement,
-    forceRender,
-    addUnsavedChange,
-    removeUnsavedChange,
-    removeGoal,
-    removeAchievement
-  } = props;
+  const { requestPublish } = props;
+
+  const inferencer = useContext(AchievementContext);
 
   /**
-   * NOTE: This helps us to ensure that only ONE achievement is added
-   * every time.
+   * newId helps us to ensure that only ONE achievement is added at any point of time.
    *
-   * Refering to AchievementAdder, if the adderId is -1, this
-   * means that currently no achievement is being added and the admin is able to
-   * add a new achievement.
+   * By default,  the newId is NaN, which means currently no new achievement
+   * is being added and the admin is able to add a new achievement.
    *
-   * Alternatievly, if the adderId is not -1, this means that currently an achievement
-   * is being added to the systen and the admin is not allowed to add two achievements
-   * at one go.
+   * Conversely, if the newId is not NaN, this means currently an achievement
+   * is being added to the system and the admin is not allowed to add two achievements
+   * at one go. The newId holds the newly created achievement id until the new achievement
+   * is added into the inferencer.
    */
-  const [adderId, setAdderId] = useState<number>(-1);
+  const [newId, setNewId] = useState<number>(NaN);
+  const allowNewId = isNaN(newId);
+  const releaseId = (id: number) => (id === newId ? setNewId(NaN) : undefined);
 
-  const mapAchievementIdsToEditableCard = (achievementIds: number[]) =>
+  /**
+   * Generates <EditableAchievementCard /> components
+   *
+   * @param achievementIds an array of achievementId
+   */
+  const generateEditableCards = (achievementIds: number[]) =>
     achievementIds.map(id => (
-      <EditableAchievementCard
-        key={id}
-        achievement={inferencer.getAchievementItem(id)}
-        inferencer={inferencer}
-        updateAchievements={updateAchievements}
-        editAchievement={editAchievement}
-        forceRender={forceRender}
-        adderId={adderId}
-        setAdderId={setAdderId}
-        addUnsavedChange={addUnsavedChange}
-        removeUnsavedChange={removeUnsavedChange}
-        removeGoal={removeGoal}
-        removeAchievement={removeAchievement}
-      />
+      <EditableCard key={id} id={id} releaseId={releaseId} requestPublish={requestPublish} />
     ));
 
   return (
-    <div className="editor-cards">
-      <div className="main">
-        <ul className="display-list">{mapAchievementIdsToEditableCard(inferencer.listIds())}</ul>
-        <AchievementAdder inferencer={inferencer} adderId={adderId} setAdderId={setAdderId} />
+    <div className="achievement-editor">
+      <div className="command">
+        <AchievementAdder allowNewId={allowNewId} setNewId={setNewId} />
       </div>
+      <ul className="achievement-container">
+        {generateEditableCards(inferencer.getAllAchievementIds().reverse())}
+      </ul>
     </div>
   );
 }

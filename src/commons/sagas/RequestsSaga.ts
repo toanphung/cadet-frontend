@@ -1,8 +1,6 @@
-/*eslint no-eval: "error"*/
-/*eslint-env browser*/
 import { call } from 'redux-saga/effects';
 
-import { GameState } from '../../commons/application/ApplicationTypes';
+import { SourceLanguage, styliseSublanguage } from '../../commons/application/ApplicationTypes';
 import { ExternalLibraryName } from '../../commons/application/types/ExternalTypes';
 import {
   Assessment,
@@ -119,23 +117,6 @@ export async function getUser(tokens: Tokens): Promise<object | null> {
 }
 
 /**
- * PUT /user/game_states/
- */
-export async function putUserGameState(
-  gameStates: GameState,
-  tokens: Tokens
-): Promise<Response | null> {
-  const resp = await request('user/game_states/save', 'PUT', {
-    accessToken: tokens.accessToken,
-    refreshToken: tokens.refreshToken,
-    body: {
-      gameStates: JSON.stringify(gameStates)
-    }
-  });
-  return resp;
-}
-
-/**
  * GET /achievements
  *
  * Will be updated after a separate db for student progress is ready
@@ -164,32 +145,6 @@ export async function getAchievements(tokens: Tokens): Promise<AchievementItem[]
         goals: achievement.goals || [],
         prerequisiteIds: achievement.prerequisiteIds || []
       } as AchievementItem)
-  );
-}
-
-/**
- * GET achievements/goals
- */
-export async function getOwnGoals(tokens: Tokens): Promise<AchievementGoal[] | null> {
-  const resp = await request(`achievements/goals/`, 'GET', {
-    accessToken: tokens.accessToken,
-    refreshToken: tokens.refreshToken,
-    shouldRefresh: true
-  });
-
-  if (!resp || !resp.ok) {
-    return null; // invalid accessToken _and_ refreshToken
-  }
-
-  const achievementGoals = await resp.json();
-
-  return achievementGoals.map(
-    (goal: any) =>
-      ({
-        ...goal,
-        type: goal.type as GoalType,
-        meta: goal.meta as GoalMeta
-      } as AchievementGoal)
   );
 }
 
@@ -223,16 +178,79 @@ export async function getGoals(
 }
 
 /**
- * POST /achievements/goals/:goal_id/:student_id
+ * GET achievements/goals
  */
-export async function updateGoalProgress(
-  studentId: number,
-  progress: GoalProgress,
+export async function getOwnGoals(tokens: Tokens): Promise<AchievementGoal[] | null> {
+  const resp = await request(`achievements/goals/`, 'GET', {
+    accessToken: tokens.accessToken,
+    refreshToken: tokens.refreshToken,
+    shouldRefresh: true
+  });
+
+  if (!resp || !resp.ok) {
+    return null; // invalid accessToken _and_ refreshToken
+  }
+
+  const achievementGoals = await resp.json();
+
+  return achievementGoals.map(
+    (goal: any) =>
+      ({
+        ...goal,
+        type: goal.type as GoalType,
+        meta: goal.meta as GoalMeta
+      } as AchievementGoal)
+  );
+}
+
+/**
+ * PUT /admin/achievements
+ */
+export async function bulkUpdateAchievements(
+  achievements: AchievementItem[],
   tokens: Tokens
 ): Promise<Response | null> {
-  const resp = await request(`achievements/goals/${progress.id}/${studentId}`, 'POST', {
+  const resp = await request(`admin/achievements`, 'POST', {
     accessToken: tokens.accessToken,
-    body: { progress: progress },
+    body: { achievements: achievements },
+    noHeaderAccept: true,
+    refreshToken: tokens.refreshToken,
+    shouldAutoLogout: false,
+    shouldRefresh: true
+  });
+
+  return resp;
+}
+
+/**
+ * PUT /admin/goals
+ */
+export async function bulkUpdateGoals(
+  goals: GoalDefinition[],
+  tokens: Tokens
+): Promise<Response | null> {
+  const resp = await request(`admin/goals`, 'POST', {
+    accessToken: tokens.accessToken,
+    body: { goals: goals },
+    noHeaderAccept: true,
+    refreshToken: tokens.refreshToken,
+    shouldAutoLogout: false,
+    shouldRefresh: true
+  });
+
+  return resp;
+}
+
+/**
+ * POST /achievements/:achievement_id
+ */
+export async function editAchievement(
+  achievement: AchievementItem,
+  tokens: Tokens
+): Promise<Response | null> {
+  const resp = await request(`achievements/${achievement.id}`, 'POST', {
+    accessToken: tokens.accessToken,
+    body: { achievement: achievement },
     noHeaderAccept: true,
     refreshToken: tokens.refreshToken,
     shouldAutoLogout: false,
@@ -262,15 +280,16 @@ export async function editGoal(
 }
 
 /**
- * POST /achievements/:achievement_id
+ * POST /achievements/goals/:goal_id/:student_id
  */
-export async function editAchievement(
-  achievement: AchievementItem,
+export async function updateGoalProgress(
+  studentId: number,
+  progress: GoalProgress,
   tokens: Tokens
 ): Promise<Response | null> {
-  const resp = await request(`achievements/${achievement.id}`, 'POST', {
+  const resp = await request(`achievements/goals/${progress.id}/${studentId}`, 'POST', {
     accessToken: tokens.accessToken,
-    body: { achievement: achievement },
+    body: { progress: progress },
     noHeaderAccept: true,
     refreshToken: tokens.refreshToken,
     shouldAutoLogout: false,
@@ -840,10 +859,10 @@ export async function getGradingSummary(tokens: Tokens): Promise<GradingSummary 
 }
 
 /**
- * GET /chapter
+ * GET /settings/sublanguage
  */
-export async function fetchChapter(): Promise<Response | null> {
-  const resp = await request('chapter', 'GET', {
+export async function getSublanguage(): Promise<SourceLanguage | null> {
+  const resp = await request('settings/sublanguage', 'GET', {
     noHeaderAccept: true,
     shouldAutoLogout: false,
     shouldRefresh: true
@@ -853,16 +872,20 @@ export async function fetchChapter(): Promise<Response | null> {
     return null;
   }
 
-  return await resp.json();
+  const sublang = (await resp.json()).sublanguage;
+  return {
+    ...sublang,
+    displayName: styliseSublanguage(sublang.chapter, sublang.variant)
+  };
 }
 
 /**
- * POST /chapter/update/1
+ * PUT /settings/sublanguage
  */
-export async function changeChapter(chapterno: number, variant: string, tokens: Tokens) {
-  const resp = await request(`chapter/update/1`, 'POST', {
+export async function postSublanguage(chapter: number, variant: string, tokens: Tokens) {
+  const resp = await request(`settings/sublanguage`, 'PUT', {
     accessToken: tokens.accessToken,
-    body: { chapterno, variant },
+    body: { chapter, variant },
     noHeaderAccept: true,
     refreshToken: tokens.refreshToken,
     shouldAutoLogout: false,
