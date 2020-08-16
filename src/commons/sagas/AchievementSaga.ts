@@ -39,6 +39,7 @@ export default function* AchievementSaga(): SagaIterator {
     }));
 
     const achievements = action.payload;
+    console.log(achievements);
 
     const resp = yield call(bulkUpdateAchievements, achievements, tokens);
 
@@ -56,6 +57,7 @@ export default function* AchievementSaga(): SagaIterator {
     }));
 
     const goals = action.payload;
+    console.log(goals);
 
     const resp = yield call(bulkUpdateGoals, goals, tokens);
 

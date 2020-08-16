@@ -7,13 +7,13 @@
   width: 100%;
 
   .achievement-overview {
-    $default-margin: 0.5em;
+    $default-spacing: 0.5em;
 
     align-items: center;
     color: white;
     display: flex;
     flex-direction: row;
-    padding: $default-margin;
+    padding: $default-spacing;
 
     .level {
       $progress-bar-height: 1.2em;
@@ -44,7 +44,7 @@
       .level-progress {
         display: flex;
         height: $progress-bar-height;
-        margin: 0 0 0 $default-margin;
+        margin: 0 0 0 $default-spacing;
         width: $progress-bar-width;
 
         .progress-bar {
@@ -100,7 +100,7 @@
 
     .level,
     h3 {
-      margin: 0 $default-margin;
+      margin: 0 $default-spacing;
     }
   }
 
@@ -113,7 +113,7 @@
     $card-height: 5em;
     $card-width: 30em;
     // Default spacing should be at least 10px to prevent border glow bleeding
-    $default-margin: 1em;
+    $default-spacing: 1em;
     // View aspect ratio 18:25
     $view-height: 50em;
     $view-width: $cover-width;
@@ -141,7 +141,7 @@
         cursor: pointer;
         display: flex;
         flex-direction: column;
-        margin: auto $default-margin;
+        margin: auto $default-spacing;
 
         p {
           font-size: 0.8em;
@@ -170,11 +170,11 @@
       scrollbar-width: thin;
 
       li {
-        margin: $default-margin;
+        margin: $default-spacing;
       }
 
       li:not(:first-child) {
-        margin: 0 $default-margin $default-margin;
+        margin: 0 $default-spacing $default-spacing;
       }
 
       .task {
@@ -290,7 +290,7 @@
 
       @extend %container;
       height: 90%;
-      min-width: $view-width + $default-margin * 2;
+      min-width: $view-width + $default-spacing * 2;
       overflow-y: auto;
       scrollbar-color: white #444;
       scrollbar-width: thin;
@@ -311,7 +311,7 @@
         color: white;
         display: flex;
         flex-direction: column;
-        margin: $default-margin;
+        margin: $default-spacing;
         min-height: $view-height;
         width: $view-width;
 

@@ -6,6 +6,7 @@ exports[`Application renders correctly 1`] = `
   <div className=\\"Application__main\\">
     <Switch>
       <Route exact={true} path=\\"/achievement\\" component={{...}} />
+      <Route exact={true} path=\\"/achievement/control\\" component={{...}} />
       <Route render={[Function (anonymous)]} />
     </Switch>
   </div>

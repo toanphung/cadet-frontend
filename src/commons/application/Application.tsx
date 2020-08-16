@@ -1,6 +1,7 @@
 import { Variant } from 'js-slang/dist/types';
 import * as React from 'react';
 import { Redirect, Route, RouteComponentProps, Switch } from 'react-router';
+import AchievementControlContainer from 'src/pages/achievement/control/AchievementControlContainer';
 import DashboardContainer from 'src/pages/achievement/subcomponents/AchievementDashboardContainer';
 
 import NavigationBar from '../navigationBar/NavigationBar';
@@ -35,19 +36,6 @@ export type StateProps = {
 
 class Application extends React.Component<ApplicationProps, {}> {
   public render() {
-    const fullPaths = Constants.playgroundOnly
-      ? null
-      : [
-          <Route path="/academy" component={toAcademy(this.props)} key={0} />,
-          <Route
-            path={'/mission-control/:assessmentId(-?\\d+)?/:questionId(\\d+)?'}
-            render={toIncubator}
-            key={1}
-          />,
-          <Route path="/achievement" component={toAchievement(this.props)} key={2} />,
-          <Route path="/login" render={toLogin(this.props)} key={3} />
-        ];
-
     return (
       <div className="Application">
         <NavigationBar
@@ -59,6 +47,11 @@ class Application extends React.Component<ApplicationProps, {}> {
         <div className="Application__main">
           <Switch>
             <Route exact={true} path="/achievement" component={DashboardContainer} />
+            <Route
+              exact={true}
+              path="/achievement/control"
+              component={AchievementControlContainer}
+            />
             <Route render={this.redirectToAchievement} />
           </Switch>
         </div>

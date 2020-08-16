@@ -54,6 +54,17 @@ const NavigationBar: React.SFC<NavigationBarProps> = props => (
         <div className="navbar-button-text hidden-xs hidden-sm">Achievement</div>
       </NavLink>
     </NavbarGroup>
+
+    <NavbarGroup align={Alignment.RIGHT}>
+      <NavLink
+        activeClassName={Classes.ACTIVE}
+        className={classNames('NavigationBar__link', Classes.BUTTON, Classes.MINIMAL)}
+        to="/achievement/control"
+      >
+        <Icon icon={IconNames.ARROW_RIGHT} />
+        <div className="navbar-button-text hidden-xs hidden-sm">Achievement Control</div>
+      </NavLink>
+    </NavbarGroup>
   </Navbar>
 );
 
