@@ -3,20 +3,18 @@ import React from 'react';
 import { AssessmentMeta, GoalMeta } from 'src/features/achievement/AchievementTypes';
 
 type EditableAssessmentMetaProps = {
+  assessmentMeta: AssessmentMeta;
   changeMeta: (meta: GoalMeta) => void;
-  meta: GoalMeta;
 };
 
 function EditableAssessmentMeta(props: EditableAssessmentMetaProps) {
-  const { changeMeta, meta } = props;
-
-  const assessmentMeta = meta as AssessmentMeta;
+  const { assessmentMeta, changeMeta } = props;
   const { assessmentNumber, requiredCompletionFrac } = assessmentMeta;
 
-  const handleChangeAssessmentNumber = (assessmentNumber: string) =>
+  const changeAssessmentNumber = (assessmentNumber: string) =>
     changeMeta({ ...assessmentMeta, assessmentNumber: assessmentNumber });
 
-  const handleChangeRequiredCompletion = (requiredCompletion: number) => {
+  const changeRequiredCompletion = (requiredCompletion: number) => {
     const requiredCompletionFrac = requiredCompletion / 100;
     changeMeta({ ...assessmentMeta, requiredCompletionFrac: requiredCompletionFrac });
   };
@@ -25,7 +23,7 @@ function EditableAssessmentMeta(props: EditableAssessmentMetaProps) {
     <>
       <Tooltip content="Assessment Number">
         <EditableText
-          onChange={handleChangeAssessmentNumber}
+          onChange={changeAssessmentNumber}
           placeholder="Enter assessment number here"
           value={assessmentNumber}
         />
@@ -35,7 +33,7 @@ function EditableAssessmentMeta(props: EditableAssessmentMetaProps) {
           allowNumericCharactersOnly={true}
           max={100}
           min={0}
-          onValueChange={handleChangeRequiredCompletion}
+          onValueChange={changeRequiredCompletion}
           placeholder="Enter required completion percentage here"
           rightElement={<p>%</p>}
           value={requiredCompletionFrac * 100}

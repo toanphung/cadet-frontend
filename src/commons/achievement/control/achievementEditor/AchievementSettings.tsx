@@ -1,38 +1,29 @@
 import { Button, Dialog, EditableText, Tooltip } from '@blueprintjs/core';
 import { IconNames } from '@blueprintjs/icons';
-import React, { useContext, useState } from 'react';
-import { AchievementContext } from 'src/features/achievement/AchievementConstants';
+import React, { useState } from 'react';
+import { AchievementItem } from 'src/features/achievement/AchievementTypes';
 
 import EditableGoalIds from './achievementSettings/EditableGoalIds';
 import EditablePosition from './achievementSettings/EditablePosition';
 import EditablePrerequisiteIds from './achievementSettings/EditablePrerequisiteIds';
 
 type AchievementSettingsProps = {
-  id: number;
-  cardBackground: string;
   changeCardBackground: (cardBackground: string) => void;
   changeGoalIds: (goalIds: number[]) => void;
   changePosition: (position: number) => void;
   changePrerequisiteIds: (prerequisiteIds: number[]) => void;
-  goalIds: number[];
-  position: number;
-  prerequisiteIds: number[];
+  editableAchievement: AchievementItem;
 };
 
 function AchievementSettings(props: AchievementSettingsProps) {
   const {
-    id,
-    cardBackground,
     changeCardBackground,
     changeGoalIds,
     changePosition,
     changePrerequisiteIds,
-    goalIds,
-    position,
-    prerequisiteIds
+    editableAchievement
   } = props;
-
-  const inferencer = useContext(AchievementContext);
+  const { id, cardBackground, goalIds, position, prerequisiteIds } = editableAchievement;
 
   const [isOpen, setOpen] = useState<boolean>(false);
   const toggleOpen = () => setOpen(!isOpen);
@@ -57,16 +48,12 @@ function AchievementSettings(props: AchievementSettingsProps) {
           <EditablePosition changePosition={changePosition} position={position} />
           <h3>Prerequisites</h3>
           <EditablePrerequisiteIds
-            availableIds={inferencer.listAvailablePrerequisiteIds(id)}
             changePrerequisiteIds={changePrerequisiteIds}
+            id={id}
             prerequisiteIds={prerequisiteIds}
           />
           <h3>Goals</h3>
-          <EditableGoalIds
-            allGoalIds={inferencer.getAllGoalIds()}
-            changeGoalIds={changeGoalIds}
-            goalIds={goalIds}
-          />
+          <EditableGoalIds changeGoalIds={changeGoalIds} goalIds={goalIds} />
         </div>
       </Dialog>
     </>

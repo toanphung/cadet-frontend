@@ -1,7 +1,13 @@
 import { Button, MenuItem, Tooltip } from '@blueprintjs/core';
 import { ItemRenderer, Select } from '@blueprintjs/select';
 import React from 'react';
-import { GoalMeta, GoalType } from 'src/features/achievement/AchievementTypes';
+import {
+  AssessmentMeta,
+  BinaryMeta,
+  GoalMeta,
+  GoalType,
+  ManualMeta
+} from 'src/features/achievement/AchievementTypes';
 
 import { metaTemplate } from './GoalTemplate';
 import EditableAssessmentMeta from './metaDetails/EditableAssessmentMeta';
@@ -22,16 +28,18 @@ function EditableMeta(props: EditableMetaProps) {
     <MenuItem key={type} onClick={handleClick} text={type} />
   );
 
-  const handleChangeType = (type: GoalType) => changeMeta(metaTemplate(type));
+  const changeType = (type: GoalType) => changeMeta(metaTemplate(type));
 
   const editableMetaDetails = (type: GoalType) => {
     switch (type) {
       case GoalType.ASSESSMENT:
-        return <EditableAssessmentMeta changeMeta={changeMeta} meta={meta} />;
+        return (
+          <EditableAssessmentMeta assessmentMeta={meta as AssessmentMeta} changeMeta={changeMeta} />
+        );
       case GoalType.BINARY:
-        return <EditableBinaryMeta changeMeta={changeMeta} meta={meta} />;
+        return <EditableBinaryMeta binaryMeta={meta as BinaryMeta} changeMeta={changeMeta} />;
       case GoalType.MANUAL:
-        return <EditableManualMeta changeMeta={changeMeta} meta={meta} />;
+        return <EditableManualMeta changeMeta={changeMeta} manualMeta={meta as ManualMeta} />;
       default:
         return null;
     }
@@ -44,7 +52,7 @@ function EditableMeta(props: EditableMetaProps) {
           filterable={false}
           itemRenderer={typeRenderer}
           items={Object.values(GoalType)}
-          onItemSelect={handleChangeType}
+          onItemSelect={changeType}
         >
           <Button minimal={true} outlined={true} text={type} />
         </TypeSelect>

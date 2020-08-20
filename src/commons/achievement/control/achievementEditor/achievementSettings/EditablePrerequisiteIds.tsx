@@ -4,15 +4,16 @@ import React, { useContext } from 'react';
 import { AchievementContext } from 'src/features/achievement/AchievementConstants';
 
 type EditablePrerequisiteIdsProps = {
-  availableIds: number[];
   changePrerequisiteIds: (prerequisiteIds: number[]) => void;
+  id: number;
   prerequisiteIds: number[];
 };
 
 function EditablePrerequisiteIds(props: EditablePrerequisiteIdsProps) {
-  const { availableIds, changePrerequisiteIds, prerequisiteIds } = props;
+  const { changePrerequisiteIds, id, prerequisiteIds } = props;
 
   const inferencer = useContext(AchievementContext);
+  const availableIds = inferencer.listAvailablePrerequisiteIds(id);
   const getId = (title: string) => inferencer.getIdByTitle(title);
   const getTitle = (id: number) => inferencer.getTitleById(id);
 
@@ -24,13 +25,13 @@ function EditablePrerequisiteIds(props: EditablePrerequisiteIdsProps) {
   const selectedPrereqs = new Set(prerequisiteIds);
   const availablePrereqs = new Set(availableIds);
 
-  const handleSelectPrereq = (selectId: number) => {
+  const selectPrereq = (selectId: number) => {
     selectedPrereqs.add(selectId);
     availablePrereqs.delete(selectId);
     changePrerequisiteIds([...selectedPrereqs]);
   };
 
-  const handleRemovePrereq = (removeId?: number) => {
+  const removePrereq = (removeId?: number) => {
     if (removeId === undefined) return;
 
     selectedPrereqs.delete(removeId);
@@ -43,9 +44,9 @@ function EditablePrerequisiteIds(props: EditablePrerequisiteIdsProps) {
       itemRenderer={prerequisiteRenderer}
       items={[...availablePrereqs]}
       noResults={<MenuItem disabled={true} text="No available achievement" />}
-      onItemSelect={handleSelectPrereq}
+      onItemSelect={selectPrereq}
       selectedItems={[...selectedPrereqs]}
-      tagInputProps={{ onRemove: title => handleRemovePrereq(getId(title)) }}
+      tagInputProps={{ onRemove: title => removePrereq(getId(title)) }}
       tagRenderer={getTitle}
     />
   );

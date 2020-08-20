@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import { Prompt } from 'react-router';
 
 import AchievementEditor from '../../../commons/achievement/control/AchievementEditor';
@@ -10,10 +10,10 @@ import { AchievementContext } from '../../../features/achievement/AchievementCon
 import { AchievementItem, GoalDefinition } from '../../../features/achievement/AchievementTypes';
 
 export type DispatchProps = {
-  handleBulkUpdateAchievements: (achievements: AchievementItem[]) => void;
-  handleBulkUpdateGoals: (goals: GoalDefinition[]) => void;
-  handleGetAchievements: () => void;
-  handleGetOwnGoals: () => void;
+  bulkUpdateAchievements: (achievements: AchievementItem[]) => void;
+  bulkUpdateGoals: (goals: GoalDefinition[]) => void;
+  getAchievements: () => void;
+  getOwnGoals: () => void;
 };
 
 export type StateProps = {
@@ -22,48 +22,52 @@ export type StateProps = {
 
 function AchievementControl(props: DispatchProps & StateProps) {
   const {
-    handleBulkUpdateAchievements,
-    handleBulkUpdateGoals,
-    handleGetAchievements,
-    handleGetOwnGoals,
+    bulkUpdateAchievements,
+    bulkUpdateGoals,
+    getAchievements,
+    getOwnGoals,
     inferencer
   } = props;
 
   /**
-   * The latest achievements and goals from backend are fetched when the page is rendered
+   * Fetch the latest achievements and goals from backend when the page is rendered
    */
   useEffect(() => {
     if (Constants.useBackend) {
-      handleGetAchievements();
-      handleGetOwnGoals();
+      getAchievements();
+      getOwnGoals();
     }
-  }, [handleGetAchievements, handleGetOwnGoals]);
-
-  const achievements = inferencer.getAllAchievements();
-  const goals = inferencer.getAllGoals();
+  }, [getAchievements, getOwnGoals]);
 
   /**
    * Monitors changes that are awaiting publish
    */
-  const publishState = useState<boolean>(false);
-  const [awaitPublish, setAwaitPublish] = publishState;
-  const handlePublish = () => {
+  const [awaitPublish, setAwaitPublish] = useState<boolean>(false);
+  const publishChanges = () => {
     // NOTE: Update goals first because goals must exist before their ID can be specified in achievements
-    handleBulkUpdateGoals(goals);
-    handleBulkUpdateAchievements(achievements);
+    bulkUpdateGoals(inferencer.getAllGoals());
+    bulkUpdateAchievements(inferencer.getAllAchievements());
     setAwaitPublish(false);
   };
   const requestPublish = () => {
     setAwaitPublish(true);
-    forceRender();
+    forceUpdate();
   };
 
   /**
-   * Allows editor components to trigger a page re-render so that the AchievementPreview
-   * displays the latest local changes
+   * Allows editor components to trigger a page re-render whenever the inferencer is modified
+   * so that the AchievementPreview displays the latest local changes
+   *
+   * NOTE: Although the inferencer is passed to the value prop of AchievementContext.Provider,
+   * changes to the inferencer does not trigger a re-render in all AchievementContext.Consumer
+   * as expected because Context uses reference identity to determine when to re-render. When
+   * the editor components update the inferencer by calling inferencer.modifyAchievement(...)
+   * or inferencer.modifyGoalDefinition(...), the Context does not register the changes hence
+   * a forceUpdate() hook is needed.
+   *
+   * See: https://reactjs.org/docs/context.html#caveats
    */
-  const [render, setRender] = useState<boolean>();
-  const forceRender = () => setRender(!render);
+  const [, forceUpdate] = useReducer(x => x + 1, 0);
 
   return (
     <AchievementContext.Provider value={inferencer}>
@@ -73,7 +77,7 @@ function AchievementControl(props: DispatchProps & StateProps) {
       />
 
       <div className="AchievementControl">
-        <AchievementPreview awaitPublish={awaitPublish} handlePublish={handlePublish} />
+        <AchievementPreview awaitPublish={awaitPublish} publishChanges={publishChanges} />
 
         <AchievementEditor requestPublish={requestPublish} />
 
